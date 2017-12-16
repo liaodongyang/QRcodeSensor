@@ -12,6 +12,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -31,6 +32,10 @@ import com.chen.library.zxing.CaptureActivity;
 import com.chen.library.zxing.ZXingConstants;
 import com.chen.library.zxing.utils.ZXingUtils;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText editText;
     private CheckBox checkbox;
     private Button getRGB;
+    private Button saveimage;
     private LocationManager locationManager;
     private String provider;
     private static int TAKE_PHOTO_REQUEST = 3;
@@ -115,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         imageView = (ImageView) findViewById(R.id.imageView);
         editText = (EditText) findViewById(R.id.editText);
         checkbox = (CheckBox) findViewById(R.id.checkbox);
-
+        saveimage = (Button) findViewById(R.id.savephoto);
         latitude = (TextView) findViewById(R.id.latitude);
         longitude = (TextView) findViewById(R.id.longitude);
         loctype = (TextView) findViewById(R.id.loctype);
@@ -131,6 +137,31 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent,TAKE_PHOTO_REQUEST);
             }
         });
+
+        saveimage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(RGBp != null){
+                    FileOutputStream out = null;
+                    File file = new File(Environment.getExternalStorageDirectory(),System.currentTimeMillis()+".jpg");
+                    try {
+                        out = new FileOutputStream(file);
+                        RGBp.compress(Bitmap.CompressFormat.JPEG,90,out);
+
+                    }catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        out.flush();
+                        out.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Toast.makeText(MainActivity.this,"Aleady save in" + Environment.getExternalStorageDirectory(),Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
         imageView.setImageDrawable(getResources().getDrawable(R.drawable.android_example));
 
 
